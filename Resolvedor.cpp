@@ -6,5 +6,5 @@ Resolvedor::Resolvedor(const Matriz& m) : matriz{new Matriz{m}} {
 }
 
 Resolvedor::~Resolvedor() {
-
+  delete matriz;
 }

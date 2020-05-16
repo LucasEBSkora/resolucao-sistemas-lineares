@@ -8,10 +8,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include <limits>
-
-double Matriz::pseudozero{-std::numeric_limits<double>().min()};
-
+#include "constantes.hpp"
 
 Matriz::Matriz(const std::vector<std::vector<double>> m) {
   altura = m.size();
@@ -73,8 +70,8 @@ Matriz::Matriz(const Matriz& m) : largura{m.getLargura()}, altura{m.getAltura()}
 }
 
 Matriz::~Matriz() {
-  for (unsigned int i = 0; i < altura; ++i) delete matriz[i];
-  delete matriz;
+  for (unsigned int i = 0; i < altura; ++i) delete[] matriz[i];
+  delete []matriz;
 }
 
 const double* Matriz::operator [](unsigned int indice) const {
@@ -112,26 +109,28 @@ unsigned int Matriz::getAltura() const {
 }
 
 void Matriz::imprimir(unsigned short precisao /* = 5*/) const {
-  std::cout << std::fixed << std::setprecision(precisao);
-  // std::cout << std::setw(precisao);
 
-  float espacosNecessarios;
+  
+  std::cout << std::fixed << std::setprecision(precisao);
+
+  unsigned short algarismosEsquerdaVirgula = 0;
   for (unsigned int i = 0; i < altura; ++i) {
     for (unsigned int j = 0; j < largura; ++j) {
-      double espacos = (matriz[i][j] < 0) ? 2 : 1; 
+      double espacos = 0;
       double valor = fabs(matriz[i][j]);
       espacos += ceil(log10(valor));
 
-      if (espacos > espacosNecessarios) espacosNecessarios = espacos;
+      if (espacos > algarismosEsquerdaVirgula) algarismosEsquerdaVirgula = espacos;
     }
   }
 
+  unsigned short espacos = precisao + algarismosEsquerdaVirgula;
 
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
     for (unsigned int j = 0; j < largura; ++j) {
-      if (matriz[i][j] > pseudozero) std::cout << " ";
-      std::cout << std::setw(precisao + espacosNecessarios) << matriz[i][j] << " ";
+      if (matriz[i][j] > -constantes::pseudozero) std::cout << " ";
+      std::cout << std::setw(espacos) << matriz[i][j] << " ";
     }
     std::cout << "|\n";
   }
@@ -143,13 +142,11 @@ void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const 
   
   
   std::cout << std::fixed << std::setprecision(precisao);
-  // std::cout << std::setw(precisao);
 
-  float algarismosEsquerdaVirgula;
+  unsigned short algarismosEsquerdaVirgula = 0;
   for (unsigned int i = 0; i < altura; ++i) {
     for (unsigned int j = 0; j < largura; ++j) {
-      double espacos = 0;//(matriz[i][j] < 0) ? 1 : 0; 
-      std::cout << "\t debug: " << i << " " << j << " " << matriz[i][j] << std::endl;
+      double espacos = 0;
       double valor = fabs(matriz[i][j]);
       espacos += ceil(log10(valor));
 
@@ -157,17 +154,17 @@ void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const 
     }
   }
 
-  unsigned int espacos = precisao + algarismosEsquerdaVirgula;
+  unsigned short espacos = precisao + algarismosEsquerdaVirgula;
 
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
     for (unsigned int j = 0; j < largura - 1; ++j) {
-      if (matriz[i][j] > pseudozero) std::cout << " ";
+      if (matriz[i][j] > -constantes::pseudozero) std::cout << " ";
       std::cout << std::setw(espacos) << matriz[i][j] << " ";
     }
 
     std::cout << "| ";
-    if (matriz[i][largura - 1] >= pseudozero) std::cout << " ";
+    if (matriz[i][largura - 1] >= -constantes::pseudozero) std::cout << " ";
     std::cout << std::setw(espacos) << matriz[i][largura - 1] << " ";
     
     std::cout << "|\n";
