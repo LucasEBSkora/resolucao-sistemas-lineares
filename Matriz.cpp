@@ -8,6 +8,11 @@
 #include <iomanip>
 #include <fstream>
 
+#include <limits>
+
+double Matriz::pseudozero{-std::numeric_limits<double>().min()};
+
+
 Matriz::Matriz(const std::vector<std::vector<double>> m) {
   altura = m.size();
   if (!altura) exit(-1);
@@ -125,6 +130,7 @@ void Matriz::imprimir(unsigned short precisao /* = 5*/) const {
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
     for (unsigned int j = 0; j < largura; ++j) {
+      if (matriz[i][j] > pseudozero) std::cout << " ";
       std::cout << std::setw(precisao + espacosNecessarios) << matriz[i][j] << " ";
     }
     std::cout << "|\n";
@@ -135,13 +141,15 @@ void Matriz::imprimir(unsigned short precisao /* = 5*/) const {
 
 void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const {
   
+  
   std::cout << std::fixed << std::setprecision(precisao);
   // std::cout << std::setw(precisao);
 
   float algarismosEsquerdaVirgula;
   for (unsigned int i = 0; i < altura; ++i) {
     for (unsigned int j = 0; j < largura; ++j) {
-      double espacos = (matriz[i][j] < 0) ? 1 : 0; 
+      double espacos = 0;//(matriz[i][j] < 0) ? 1 : 0; 
+      std::cout << "\t debug: " << i << " " << j << " " << matriz[i][j] << std::endl;
       double valor = fabs(matriz[i][j]);
       espacos += ceil(log10(valor));
 
@@ -154,9 +162,14 @@ void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const 
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
     for (unsigned int j = 0; j < largura - 1; ++j) {
-      std::cout << std::setw(precisao + algarismosEsquerdaVirgula) << matriz[i][j] << " ";
+      if (matriz[i][j] > pseudozero) std::cout << " ";
+      std::cout << std::setw(espacos) << matriz[i][j] << " ";
     }
-    std::cout << "| " << std::setw(precisao + algarismosEsquerdaVirgula) << matriz[i][largura - 1] << " ";
+
+    std::cout << "| ";
+    if (matriz[i][largura - 1] >= pseudozero) std::cout << " ";
+    std::cout << std::setw(espacos) << matriz[i][largura - 1] << " ";
+    
     std::cout << "|\n";
   }
 

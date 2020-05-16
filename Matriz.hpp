@@ -5,9 +5,14 @@
 
 class Matriz {
   private: 
+
+    static double pseudozero;
+
+
     double** matriz;
     unsigned int largura;
     unsigned int altura;
+
   public:
     //Para carregar de um vetor criado em tempo de execução ou através de uma lista de inicialização
     Matriz(std::vector<std::vector<double>> m);
