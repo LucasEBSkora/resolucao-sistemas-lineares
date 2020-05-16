@@ -4,7 +4,7 @@
 #include <limits>
 
 namespace constantes {
-  const double pseudozero{std::numeric_limits<double>().min()};
+  const double pseudozero{1e-1};
   const double epsilon{1e-10};
 }
 

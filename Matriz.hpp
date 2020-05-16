@@ -29,6 +29,9 @@ class Matriz {
     unsigned int getAltura() const;
     void imprimir(unsigned short precisao = 5) const;
     void imprimirComoMatrizAumentada(unsigned short precisao = 5) const;
+
+  private:
+    void imprimirDoubleFormatado(double valor, unsigned short precisao, unsigned short espacos) const;
 };
 
 #endif

@@ -129,8 +129,7 @@ void Matriz::imprimir(unsigned short precisao /* = 5*/) const {
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
     for (unsigned int j = 0; j < largura; ++j) {
-      if (matriz[i][j] > -constantes::pseudozero) std::cout << " ";
-      std::cout << std::setw(espacos) << matriz[i][j] << " ";
+      imprimirDoubleFormatado(matriz[i][j], precisao, espacos);
     }
     std::cout << "|\n";
   }
@@ -154,21 +153,31 @@ void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const 
     }
   }
 
-  unsigned short espacos = precisao + algarismosEsquerdaVirgula;
+  std::cout << algarismosEsquerdaVirgula << std::endl;
+
+  unsigned short espacos = precisao + algarismosEsquerdaVirgula + 1;
+
+  std::cout << espacos << std::endl;
 
   for (unsigned int i = 0; i < altura; ++i) {
     std::cout << "| ";
-    for (unsigned int j = 0; j < largura - 1; ++j) {
-      if (matriz[i][j] > -constantes::pseudozero) std::cout << " ";
-      std::cout << std::setw(espacos) << matriz[i][j] << " ";
-    }
+
+    for (unsigned int j = 0; j < largura - 1; ++j) 
+      imprimirDoubleFormatado(matriz[i][j], precisao, espacos);
 
     std::cout << "| ";
-    if (matriz[i][largura - 1] >= -constantes::pseudozero) std::cout << " ";
-    std::cout << std::setw(espacos) << matriz[i][largura - 1] << " ";
+    imprimirDoubleFormatado(matriz[i][largura - 1], precisao, espacos);
     
     std::cout << "|\n";
   }
 
   std::cout.flush();
+}
+
+void Matriz::imprimirDoubleFormatado(double valor, unsigned short precisao, unsigned short espacos) const {
+  if (fabs(valor) < pow(10, -precisao)) valor = 0.0;
+
+  std::cout << ((valor >= 0.0) ? " " : "-");
+  
+  std::cout << std::setw(espacos) << fabs(valor) << " ";
 }
