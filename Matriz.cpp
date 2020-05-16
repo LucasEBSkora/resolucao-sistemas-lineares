@@ -1,8 +1,12 @@
 #include "Matriz.hpp"
 
-#include <stdlib.h>
+#include <stdlib.h> 
+
+#include <math.h>
+
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 Matriz::Matriz(const std::vector<std::vector<double>> m) {
   altura = m.size();
@@ -27,6 +31,42 @@ Matriz::Matriz(const std::vector<std::vector<double>> m) {
 
 }
 
+Matriz::Matriz(const char *caminho) {
+  std::ifstream arquivo(caminho);
+
+  if (!arquivo.is_open()) exit(-1);
+
+  arquivo >> altura;
+  arquivo >> largura;
+
+  matriz = new double*[altura];
+
+  for (unsigned int i = 0; i < altura; ++i) {
+    matriz[i] = new double[largura];
+  }
+
+  for (unsigned int i = 0; i < altura; ++i) 
+    for (unsigned int j = 0; j < largura; ++j) 
+      arquivo >> matriz[i][j];
+
+}
+
+Matriz::Matriz() : matriz{nullptr}, largura{0}, altura{0} {
+
+}
+
+Matriz::Matriz(const Matriz& m) : largura{m.getLargura()}, altura{m.getAltura()} {
+  matriz = new double*[altura];
+
+  for (unsigned int i = 0; i < altura; ++i) {
+    matriz[i] = new double[largura];
+  }
+
+  for (unsigned int i = 0; i < altura; ++i) 
+    for (unsigned int j = 0; j < largura; ++j) 
+      matriz[i][j] = m[i][j];
+}
+
 Matriz::~Matriz() {
   for (unsigned int i = 0; i < altura; ++i) delete matriz[i];
   delete matriz;
@@ -44,17 +84,12 @@ void Matriz::multiplicarLinha(unsigned int indice, double valor) {
 }
 
 void Matriz::trocarLinhas(unsigned int indice1, unsigned int indice2) {
-  double* linha1 = matriz[indice1];
-  double* linha2 = matriz[indice2];
-  double aux;
-  for (unsigned int i = 0; i < largura; ++i) {
-    aux = linha1[i];
-    linha1[i] = linha2[i];
-    linha2[i] = aux;
-  }
+  double* aux = matriz[indice1];
+  matriz[indice1] = matriz[indice2];
+  matriz[indice2] = aux;
 }
 
-void Matriz::somarLinhas(unsigned int indice1, unsigned int indice2, double coeficiente = 1) {
+void Matriz::somarLinhas(unsigned int indice1, unsigned int indice2, double coeficiente /*= 1*/) {
   double* linha1 = matriz[indice1];
   double* linha2 = matriz[indice2];
   for (unsigned int i = 0; i < largura; ++i) {
@@ -71,14 +106,58 @@ unsigned int Matriz::getAltura() const {
   return altura;
 }
 
-void Matriz::imprimir(unsigned short precisao) const {
+void Matriz::imprimir(unsigned short precisao /* = 5*/) const {
   std::cout << std::fixed << std::setprecision(precisao);
-  
+  // std::cout << std::setw(precisao);
+
+  float espacosNecessarios;
   for (unsigned int i = 0; i < altura; ++i) {
     for (unsigned int j = 0; j < largura; ++j) {
-      std::cout << matriz[i][j] << " ";
+      double espacos = (matriz[i][j] < 0) ? 2 : 1; 
+      double valor = fabs(matriz[i][j]);
+      espacos += ceil(log10(valor));
+
+      if (espacos > espacosNecessarios) espacosNecessarios = espacos;
     }
-    std::cout << '\n';
+  }
+
+
+  for (unsigned int i = 0; i < altura; ++i) {
+    std::cout << "| ";
+    for (unsigned int j = 0; j < largura; ++j) {
+      std::cout << std::setw(precisao + espacosNecessarios) << matriz[i][j] << " ";
+    }
+    std::cout << "|\n";
+  }
+
+  std::cout.flush();
+}
+
+void Matriz::imprimirComoMatrizAumentada(unsigned short precisao /*= 5*/) const {
+  
+  std::cout << std::fixed << std::setprecision(precisao);
+  // std::cout << std::setw(precisao);
+
+  float algarismosEsquerdaVirgula;
+  for (unsigned int i = 0; i < altura; ++i) {
+    for (unsigned int j = 0; j < largura; ++j) {
+      double espacos = (matriz[i][j] < 0) ? 1 : 0; 
+      double valor = fabs(matriz[i][j]);
+      espacos += ceil(log10(valor));
+
+      if (espacos > algarismosEsquerdaVirgula) algarismosEsquerdaVirgula = espacos;
+    }
+  }
+
+  unsigned int espacos = precisao + algarismosEsquerdaVirgula;
+
+  for (unsigned int i = 0; i < altura; ++i) {
+    std::cout << "| ";
+    for (unsigned int j = 0; j < largura - 1; ++j) {
+      std::cout << std::setw(precisao + algarismosEsquerdaVirgula) << matriz[i][j] << " ";
+    }
+    std::cout << "| " << std::setw(precisao + algarismosEsquerdaVirgula) << matriz[i][largura - 1] << " ";
+    std::cout << "|\n";
   }
 
   std::cout.flush();
